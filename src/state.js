@@ -26,6 +26,7 @@ export function createInitialState() {
       freezeSecondsLeft: 0,
       feverSecondsLeft: 0,
       specialCooldownLeft: 0,
+      hitGraceSecondsLeft: 2.5,
     },
     metrics: {
       stars: 0,

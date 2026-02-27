@@ -8,7 +8,7 @@ export function createGame({ input, renderer, onHUDUpdate, onSessionEnd }) {
   let s = createInitialState(), running = false, paused = false, last = 0, raf = 0, sent = false;
   const mode = () => s.boss.active ? `Boss (${s.boss.hp})` : s.effects.freezeSecondsLeft > 0 ? "Freeze" : s.effects.feverSecondsLeft > 0 ? "Fever" : "Normal";
   const hud = () => onHUDUpdate({ score: s.score, level: s.level, lives: Math.max(0, s.lives), time: Math.max(0, Math.ceil(s.timeLeft)), powerUp: getPowerUpLabel(s), combo: s.combo, mode: mode(), special: Math.ceil(s.effects.specialCooldownLeft) });
-  const end = () => { if (sent || !s.isGameOver) return; sent = true; onSessionEnd?.({ score: s.score, level: s.level, lives: Math.max(0, s.lives), won: s.result === "won", stars: s.metrics.stars + s.metrics.goldStars, bombsHit: s.metrics.bombsHit, powerUps: s.metrics.powerUps }); };
+  const end = () => { if (sent || !s.isGameOver) return; sent = true; onSessionEnd?.({ score: s.score, level: s.level, lives: Math.max(0, s.lives), won: s.result === "won" || s.result === "victory", stars: s.metrics.stars + s.metrics.goldStars, bombsHit: s.metrics.bombsHit, powerUps: s.metrics.powerUps }); };
   const boss = (d) => {
     if (!s.boss.active && s.level >= s.boss.nextLevel) { s.boss.active = true; s.boss.hp = GAME_CONFIG.bossHitsToClear; s.boss.timeLeft = GAME_CONFIG.bossWaveDurationSeconds; s.boss.target = null; }
     if (!s.boss.active) return;
@@ -34,10 +34,11 @@ export function createGame({ input, renderer, onHUDUpdate, onSessionEnd }) {
     if (s.spawn.bombTimer >= intervalFor(GAME_CONFIG.bombSpawnInterval, s.difficulty * bossRate)) { s.spawn.bombTimer = 0; spawnBomb(s); }
     if (s.spawn.powerUpTimer >= intervalFor(GAME_CONFIG.powerUpSpawnInterval, s.difficulty)) { s.spawn.powerUpTimer = 0; spawnPowerUp(s); }
     if (s.spawn.secondTimer >= 1) { s.spawn.secondTimer -= 1; s.timeLeft -= 1; }
-    const h = updateEntities(s, d * slow); tickPowerUpEffects(s, d); s.effects.feverSecondsLeft = Math.max(0, s.effects.feverSecondsLeft - d); s.effects.specialCooldownLeft = Math.max(0, s.effects.specialCooldownLeft - d); s.comboTimer = Math.max(0, s.comboTimer - d);
+    const h = updateEntities(s, d * slow); tickPowerUpEffects(s, d); s.effects.feverSecondsLeft = Math.max(0, s.effects.feverSecondsLeft - d); s.effects.specialCooldownLeft = Math.max(0, s.effects.specialCooldownLeft - d); s.effects.hitGraceSecondsLeft = Math.max(0, s.effects.hitGraceSecondsLeft - d); s.comboTimer = Math.max(0, s.comboTimer - d);
     const picked = h.starHits + h.goldHits; if (picked > 0) { s.combo = Math.min(16, s.combo + picked); s.comboTimer = 1.4; if (s.combo >= 9) s.effects.feverSecondsLeft = 5; const m = 1 + Math.floor(s.combo / 3) + (s.effects.feverSecondsLeft > 0 ? 1 : 0); s.score += h.starHits * 10 * m + h.goldHits * 25 * m; }
     if (h.bossHits > 0 && s.boss.active) { s.boss.hp -= h.bossHits; s.score += 55 * h.bossHits; if (s.boss.hp <= 0) { s.boss.active = false; s.boss.nextLevel += GAME_CONFIG.bossLevelStep; s.score += 140; s.effects.feverSecondsLeft = Math.max(6, s.effects.feverSecondsLeft); } }
     if (h.bombHits > 0 || s.comboTimer <= 0) s.combo = 0; if (h.powerHits > 0) s.score += 8 * h.powerHits;
+    if (s.level >= GAME_CONFIG.maxLevel && !s.boss.active) { s.isGameOver = true; s.result = "victory"; }
     if (s.lives <= 0) { s.isGameOver = true; s.result = "lost"; } else if (s.timeLeft <= 0) { s.isGameOver = true; s.result = "won"; }
   };
   const tick = (now) => { if (!running || paused) return; if (!last) last = now; const d = Math.min((now - last) / 1000, 0.05); last = now; if (!s.isGameOver) step(d); hud(); renderer.render(s); end(); raf = requestAnimationFrame(tick); };
@@ -45,6 +46,11 @@ export function createGame({ input, renderer, onHUDUpdate, onSessionEnd }) {
     start() { if (running) return; running = true; paused = false; s.isPaused = false; last = 0; sent = false; hud(); renderer.render(s); raf = requestAnimationFrame(tick); },
     pause() { if (!running || paused || s.isGameOver) return false; paused = true; s.isPaused = true; cancelAnimationFrame(raf); hud(); renderer.render(s); return true; },
     resume() { if (!running || !paused || s.isGameOver) return false; paused = false; s.isPaused = false; last = 0; raf = requestAnimationFrame(tick); return true; },
+    abort() {
+      if (!running || s.isGameOver) return false;
+      s.isGameOver = true; s.result = "aborted"; paused = true; cancelAnimationFrame(raf);
+      hud(); renderer.render(s); end(); return true;
+    },
     triggerSpecial: pulse,
     restart() { paused = false; s = createInitialState(); s.isPaused = false; sent = false; hud(); renderer.render(s); if (running) { cancelAnimationFrame(raf); last = 0; raf = requestAnimationFrame(tick); } },
     stop() { running = false; paused = false; s.isPaused = false; cancelAnimationFrame(raf); input.cleanup(); },

@@ -38,7 +38,8 @@ export function createRenderer(canvas) {
     ctx.fillStyle = "#ffffff";
     ctx.textAlign = "center";
     ctx.font = "bold 34px Segoe UI";
-    ctx.fillText(state.result === "won" ? "Session Complete" : "Game Over", GAME_CONFIG.width / 2, GAME_CONFIG.height / 2 - 18);
+    const title = state.result === "victory" ? "Victory" : state.result === "won" ? "Session Complete" : state.result === "aborted" ? "Run Aborted" : "Game Over";
+    ctx.fillText(title, GAME_CONFIG.width / 2, GAME_CONFIG.height / 2 - 18);
     ctx.font = "20px Segoe UI";
     ctx.fillText(`Final Score: ${state.score}`, GAME_CONFIG.width / 2, GAME_CONFIG.height / 2 + 20);
   }

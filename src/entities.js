@@ -15,7 +15,7 @@ export function updateEntities(state, dt) {
   let starHits = 0, goldHits = 0, bombHits = 0, powerHits = 0, bossHits = 0;
   mv(state.stars, dt); mv(state.bombs, dt); mv(state.powerUps, dt);
   state.stars = state.stars.filter((v) => { if (ov(v, state.player)) { if (v.kind === "gold") { state.metrics.goldStars += 1; goldHits += 1; } else { state.metrics.stars += 1; starHits += 1; } return false; } return v.y - v.radius <= GAME_CONFIG.height; });
-  state.bombs = state.bombs.filter((v) => { if (ov(v, state.player)) { if (!isShieldActive(state)) { state.lives -= 1; state.metrics.bombsHit += 1; bombHits += 1; } return false; } return v.y - v.radius <= GAME_CONFIG.height; });
+  state.bombs = state.bombs.filter((v) => { if (ov(v, state.player)) { if (!isShieldActive(state) && state.effects.hitGraceSecondsLeft <= 0) { state.lives -= 1; state.metrics.bombsHit += 1; bombHits += 1; state.effects.hitGraceSecondsLeft = 1.2; } return false; } return v.y - v.radius <= GAME_CONFIG.height; });
   state.powerUps = state.powerUps.filter((v) => { if (ov(v, state.player)) { applyPowerUp(state, v.type); state.metrics.powerUps += 1; powerHits += 1; return false; } return v.y - v.radius <= GAME_CONFIG.height; });
   if (state.boss.target) {
     state.boss.target.y += state.boss.target.speed * dt;

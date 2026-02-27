@@ -1,3 +1,5 @@
+import { GAME_CONFIG } from "./config.js";
+
 const STEP = 120;
 
 function levelForScore(score) {
@@ -9,7 +11,7 @@ function difficultyForLevel(level) {
 }
 
 export function tickProgression(state) {
-  state.level = levelForScore(state.score);
+  state.level = Math.min(GAME_CONFIG.maxLevel, levelForScore(state.score));
   state.difficulty = difficultyForLevel(state.level);
 }
 
