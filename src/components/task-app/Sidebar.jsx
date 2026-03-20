@@ -8,14 +8,16 @@ function sidebarIconFor(id) {
 
 export default function Sidebar({
   appName,
+  ownerName,
   items,
   navItems,
   section,
   onSectionChange,
   getCount,
+  onOpenSettings,
 }) {
   return (
-    <aside className="flex flex-col bg-[linear-gradient(180deg,#0f1722_0%,#111b27_100%)] px-5 py-6 text-white">
+    <aside className="flex h-screen flex-col overflow-y-auto bg-[linear-gradient(180deg,#0f1722_0%,#111b27_100%)] px-5 py-6 text-white">
       <div className="flex items-center gap-3">
         <div className="flex h-11 w-11 items-center justify-center rounded-[18px] bg-[linear-gradient(180deg,#4fa3ff_0%,#2b78ee_100%)] text-base font-bold text-white shadow-[0_10px_20px_rgba(43,120,238,0.28)]">
           ⚡
@@ -56,6 +58,7 @@ export default function Sidebar({
       <div className="mt-8 border-t border-white/10 pt-5">
         <button
           type="button"
+          onClick={onOpenSettings}
           className="flex w-full items-center gap-3 rounded-[18px] px-4 py-3 text-left text-slate-300 transition hover:bg-white/5 hover:text-white"
         >
           <span className="text-slate-400">
@@ -68,10 +71,10 @@ export default function Sidebar({
       <div className="mt-auto border-t border-white/10 pt-5">
         <div className="flex items-center gap-3 px-4 py-2">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#738692] text-sm font-semibold">
-            A
+            {ownerName.slice(0, 1).toUpperCase()}
           </div>
           <div>
-            <p className="text-[15px] font-medium text-white">Alice Johnson</p>
+            <p className="text-[15px] font-medium text-white">{ownerName}</p>
           </div>
         </div>
       </div>
