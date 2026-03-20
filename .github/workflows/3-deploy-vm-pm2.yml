@@ -2,14 +2,9 @@
 
 name: Azure VM PM2 Pipeline
 
-# on:
-#   workflow_dispatch:
-
 on:
-    workflow_dispatch:
-    push:
-        branches:
-            - main
+  workflow_dispatch:
+
 
 jobs:
   # 2) Lint job: fail fast on repo issues.

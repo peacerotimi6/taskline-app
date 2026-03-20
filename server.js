@@ -11,12 +11,7 @@ const MIME = { ".html": "text/html; charset=utf-8", ".js": "application/javascri
 
 const appConfig = () => {
   const cfg = {
-    appEnv: process.env.APP_ENV || "production",
     appTitle: process.env.APP_TITLE || "Star Dash",
-    brandTagline: process.env.APP_BRAND_TAGLINE || "Arcade challenge game",
-    themeDefault: process.env.APP_THEME_DEFAULT || "corp",
-    showEnvBadge: process.env.APP_SHOW_ENV_BADGE || "true",
-    enableThemeSwitcher: process.env.APP_ENABLE_THEME_SWITCHER || "true",
   };
   return `window.__APP_CONFIG__=${JSON.stringify(cfg)};`;
 };
@@ -46,7 +41,6 @@ createServer(async (req, res) => {
     }
   }
 }).listen(PORT, "0.0.0.0", () => {
-  console.log(`APP_ENV=${process.env.APP_ENV || "production"}`);
   console.log(`APP_TITLE=${process.env.APP_TITLE || "Star Dash"}`);
   console.log(`Star Dash listening on port ${PORT}`);
 });

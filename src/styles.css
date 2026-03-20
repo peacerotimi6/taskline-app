@@ -1,54 +1,25 @@
-:root{--bg:linear-gradient(155deg,#f6f5f4,#fcfcfb 56%,#efeeec);--card:#ffffff;--line:#dfdbd5;--text:#2f2c29;--muted:#726b64;--blue:#4f4640;--blue-2:#3d3631;--tile:#f8f6f3;--badge-bg:#f4f1ed;--badge-text:#5b524c;--canvas-a:#fbfaf8;--canvas-b:#ece8e2;--panel-a:#ffffff;--panel-b:#f8f6f3;--shadow:rgba(62,52,43,.12)}
-body[data-theme="school"]{--bg:linear-gradient(155deg,#edf4ff,#f8fbff 56%,#e7f0ff);--card:#ffffff;--line:#cfe0f8;--text:#173456;--muted:#5f7ba0;--blue:#2f6fce;--blue-2:#2458a5;--tile:#f2f7ff;--badge-bg:#eef5ff;--badge-text:#2d5f9d;--canvas-a:#f3f8ff;--canvas-b:#dfeafc;--panel-a:#ffffff;--panel-b:#f4f8ff;--shadow:rgba(35,90,168,.14)}
-body[data-theme="stem"]{--bg:linear-gradient(155deg,#edf8f1,#fbfefc 56%,#e5f4ea);--card:#ffffff;--line:#cfe3d7;--text:#1f3a2c;--muted:#607d6f;--blue:#2f8057;--blue-2:#236243;--tile:#f2f9f5;--badge-bg:#edf8f1;--badge-text:#2a6f4d;--canvas-a:#f2fbf5;--canvas-b:#dff1e6;--panel-a:#ffffff;--panel-b:#f3faf6;--shadow:rgba(37,98,70,.13)}
-body[data-theme="corp"]{--bg:linear-gradient(155deg,#f6f5f4,#fcfcfb 56%,#efeeec);--card:#ffffff;--line:#dfdbd5;--text:#2f2c29;--muted:#726b64;--blue:#4f4640;--blue-2:#3d3631;--tile:#f8f6f3;--badge-bg:#f4f1ed;--badge-text:#5b524c;--canvas-a:#fbfaf8;--canvas-b:#ece8e2;--panel-a:#ffffff;--panel-b:#f8f6f3;--shadow:rgba(62,52,43,.12)}
-*{box-sizing:border-box} html,body,#root{margin:0;min-height:100vh}
-body{
-  display:grid;place-items:center;padding:12px;background:var(--bg);color:var(--text);
-  font-family:"Manrope","Avenir Next","Segoe UI",sans-serif;
-}
-.app{
-  width:min(96vw,900px);background:#fff;border:1px solid var(--line);border-radius:20px;
-  padding:20px;box-shadow:0 16px 46px var(--shadow);
-}
-.panel{margin-top:10px;background:var(--tile);border:1px solid var(--line);border-radius:12px;padding:10px}
-.panel h3,.panel h4{margin:0 0 6px}.panel p{margin:4px 0;color:var(--muted);font-size:.84rem}
-.top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start}
-.eyebrow{margin:0;color:var(--blue);font-weight:700;font-size:.8rem;text-transform:uppercase;letter-spacing:.08em}
-h1{margin:.35rem 0 0;font-size:1.55rem;line-height:1.2}
-.badges{display:flex;gap:8px;flex-wrap:wrap}
-.badges span{
-  border:1px solid var(--line);background:var(--badge-bg);color:var(--badge-text);
-  border-radius:999px;padding:6px 10px;font-size:.75rem;font-weight:700;
-}
-.switcher{justify-content:flex-end}
-.theme-btn{
-  border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:999px;
-  padding:6px 10px;font-size:.74rem;font-weight:700
-}
-.theme-btn.active{background:var(--blue);border-color:var(--blue);color:#fff}
-.stats{
-  margin-top:14px;display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:10px;
-}
-.stats article{background:var(--tile);border:1px solid var(--line);border-radius:12px;padding:10px}
-.stats p{margin:0;color:var(--muted);font-size:.78rem}
-.stats strong{display:block;margin-top:4px;font-size:1.1rem}
-.arena{margin-top:12px;border:1px solid var(--line);border-radius:14px;padding:10px;background:linear-gradient(180deg,var(--panel-a),var(--panel-b))}
-.controls{margin:0 0 8px;color:var(--muted);font-size:.88rem}
-#game-canvas{
-  width:100%;height:auto;border:1px solid var(--line);border-radius:10px;background:linear-gradient(180deg,var(--canvas-a),var(--canvas-b));touch-action:none;
-}
-.actions{margin-top:12px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
-.actions p{margin:0;color:var(--muted);font-size:.86rem}
-.restart-btn{
-  border:0;border-radius:10px;background:var(--blue);color:#fff;font-weight:800;padding:10px 16px;cursor:pointer
-}
-.restart-btn:hover{background:var(--blue-2)}
-.restart-btn:disabled{opacity:.55;cursor:not-allowed}
-.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-@media (max-width:980px){.stats{grid-template-columns:repeat(4,minmax(0,1fr))}}
-@media (max-width:760px){.stats,.grid2{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (max-width:560px){
-  body{padding:8px}.app{padding:14px;border-radius:14px}h1{font-size:1.24rem}
-  .actions{flex-direction:column;align-items:stretch}.restart-btn{width:100%}
+@import "tailwindcss";
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html,
+  body,
+  #root {
+    min-height: 100%;
+  }
+
+  body {
+    margin: 0;
+    font-family: "Inter", "IBM Plex Sans", "Avenir Next", "Segoe UI", sans-serif;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
 }

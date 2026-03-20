@@ -1,6 +1,6 @@
 # Star Dash
 
-A Vite + React browser game, ready for cloud deployment.
+A Vite + React browser game with a Tailwind-powered UI shell, ready for cloud deployment.
 
 ## Local Run
 
@@ -13,6 +13,12 @@ The dev server binds to `0.0.0.0` and uses:
 - `PORT` if provided
 - otherwise `VITE_PORT`
 - otherwise `5173`
+
+Example:
+
+```bash
+PORT=3000 npm run dev
+```
 
 ## Port Guide
 
@@ -34,6 +40,13 @@ PORT=8080 npm start
 
 `npm start` serves the built `dist/` app and binds to `process.env.PORT` (default `8080`), which works for Azure Web App, GCP, and AWS setups that inject a port.
 
+## UI Stack
+
+- React 18
+- Vite 5
+- Tailwind CSS 4 via `@tailwindcss/vite`
+- Canvas-based game rendering in `src/renderer.js`
+
 For Azure ZIP deploys on Linux, set:
 - startup command: `bash startup.sh`
 - app setting: `SCM_DO_BUILD_DURING_DEPLOYMENT=true`
@@ -43,37 +56,17 @@ For Azure Windows App Service, keep `web.config` at the app root.
 
 ## App Env Variables
 
-Set these in your Web App environment settings:
-- `APP_ENV=production`
-- `APP_TITLE=Velo-learn Cloud Demo`
-- `APP_THEME_DEFAULT=corp`
-- `APP_SHOW_ENV_BADGE=true`
-- `APP_ENABLE_THEME_SWITCHER=true`
-- `APP_BRAND_TAGLINE=Arcade challenge game`
+Only one app-specific env var is still used by the current UI:
+- `APP_TITLE`
 
 Runtime behavior:
 - `APP_TITLE` updates browser tab title and app heading.
-- `APP_ENV` shows as environment badge in the UI.
-- `APP_THEME_DEFAULT` sets startup theme.
-- `APP_SHOW_ENV_BADGE` shows/hides environment badge.
-- `APP_ENABLE_THEME_SWITCHER` enables/disables theme buttons.
-- `APP_BRAND_TAGLINE` replaces the header tagline.
 
 Allowed values:
-- `APP_THEME_DEFAULT`: `corp`, `school`, `stem` (fallback: `corp`)
-- `APP_SHOW_ENV_BADGE`: `true` or `false` (fallback: `true`)
-- `APP_ENABLE_THEME_SWITCHER`: `true` or `false` (fallback: `true`)
-- `APP_ENV`: any text, e.g. `production`, `staging`, `dev`
 - `APP_TITLE`: any text
-- `APP_BRAND_TAGLINE`: any text
 
 Local/dev fallback (optional):
 - `VITE_APP_TITLE`
-- `VITE_APP_ENV`
-- `VITE_APP_THEME_DEFAULT`
-- `VITE_APP_SHOW_ENV_BADGE`
-- `VITE_APP_ENABLE_THEME_SWITCHER`
-- `VITE_APP_BRAND_TAGLINE`
 
 ## Cloud Deploy Presets
 
@@ -85,7 +78,7 @@ Deployment starter files are in:
 ## Controls
 
 - Move: mouse/touch/trackpad, `ArrowLeft`/`ArrowRight`, or `A`/`D`
-- Session controls: `Pause`, `Resume`, `Restart`, `Special Pulse`
+- Session controls: `Pause`, `Resume`, `Restart`, `Special`
 
 Collect blue stars for points, avoid red bombs, and survive until time runs out.
 
@@ -103,9 +96,8 @@ Scoring:
 - Level progression and dynamic difficulty scaling during runs.
 - Win/loss session outcomes with pause overlay.
 - Pause/resume/restart controls.
-- Combo multiplier scoring and live combo HUD.
+- Live score, best score, level, lives, timer, and special cooldown display.
 - Best score tracking in-game.
 - Boss wave encounter every 4 levels (defeat target before timer expires).
 - Special Pulse ability with cooldown.
 - Multiple power-up types: Shield, Freeze, and Rush.
-- Top runs leaderboard and recent run history.

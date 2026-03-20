@@ -31,7 +31,7 @@ export function getPowerUpLabel(state) {
 }
 
 export function getPowerUpColor(type) {
-  if (type === POWER_UP_TYPES.FREEZE) return "#73c4ff";
-  if (type === POWER_UP_TYPES.RUSH) return "#f5b64c";
-  return "#73ffb6";
+  if (type === POWER_UP_TYPES.FREEZE) return "#72c3f0";
+  if (type === POWER_UP_TYPES.RUSH) return "#f0b85b";
+  return "#58d2a8";
 }

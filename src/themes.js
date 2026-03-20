@@ -1,5 +1,5 @@
 export const THEMES = [
-  { id: "school", label: "School Blue" },
-  { id: "stem", label: "STEM Green" },
-  { id: "corp", label: "Corporate Neutral" },
+  { id: "school", label: "Blue" },
+  { id: "stem", label: "Green" },
+  { id: "corp", label: "Slate" },
 ];
