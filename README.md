@@ -17,10 +17,10 @@ The dev server binds to `0.0.0.0` and uses:
 
 ```bash
 npm run build
-PORT=8080 npm start
+PORT=3000 npm start
 ```
 
-`npm start` serves the built `dist/` app and binds to `process.env.PORT` with a default of `8080`.
+`npm start` serves the built `dist/` app and binds to `process.env.PORT` with a default of `3000`.
 
 ## Docker
 

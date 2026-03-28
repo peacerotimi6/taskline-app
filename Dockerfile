@@ -23,6 +23,6 @@ RUN npm ci --omit=dev --ignore-scripts
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/server.js ./server.js
 
-EXPOSE 8080
+EXPOSE 3000
 
 CMD ["npm", "start"]
