@@ -1,4 +1,12 @@
 import { useEffect, useState } from "react";
+
+const randomUUID = () =>
+  typeof crypto !== "undefined" && crypto.randomUUID
+    ? crypto.randomUUID()
+    : "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+        const r = (Math.random() * 16) | 0;
+        return (c === "x" ? r : (r & 0x3) | 0x8).toString(16);
+      });
 import Sidebar from "./components/task-app/Sidebar.jsx";
 import Topbar from "./components/task-app/Topbar.jsx";
 import TaskFilters from "./components/task-app/TaskFilters.jsx";
@@ -22,7 +30,7 @@ import {
 
 function makeNotification(label, value) {
   return {
-    id: crypto.randomUUID(),
+    id: randomUUID(),
     label,
     value,
   };
@@ -144,7 +152,7 @@ export default function App() {
 
     setItems((current) => [
       {
-        id: crypto.randomUUID(),
+        id: randomUUID(),
         text,
         done: false,
         category: composer.category,
