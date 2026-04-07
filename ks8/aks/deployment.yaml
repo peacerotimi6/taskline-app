@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tasklineapp
+  labels:
+    app: tasklineapp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: tasklineapp
+  template:
+    metadata:
+      labels:
+        app: tasklineapp
+    spec:
+      imagePullSecrets:
+        - name: ghcr-secret
+      containers:
+        - name: tasklineapp
+          # Placeholder — replaced by the pipeline sed command at deploy time
+          image: REGISTRY_IMAGE_PLACEHOLDER
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"
