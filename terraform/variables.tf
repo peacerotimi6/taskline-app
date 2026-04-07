@@ -1,5 +1,5 @@
 variable "resource_group_name" {
-  description = "Azure resource group name for the application"
+  description = "Azure resource group name"
   type        = string
 }
 
@@ -20,7 +20,7 @@ variable "node_count" {
 }
 
 variable "acr_name" {
-  description = "Azure Container Registry name — leave empty if not using ACR"
+  description = "ACR name — leave empty if not using ACR"
   type        = string
   default     = ""
 }
