@@ -27,6 +27,7 @@ override.tf.json
 *.tfvars
 *.tfvars.json
 terraform.tfvars
+terraform/.terraform.lock.hcl
 
 # IDE/editor files
 .vscode/
