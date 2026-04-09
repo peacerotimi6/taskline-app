@@ -164,8 +164,8 @@ jobs:
 
       - name: Apply Kubernetes manifests
         run: |
-          kubectl apply -f k8s/aks/deployment.yaml
-          kubectl apply -f k8s/aks/service.yaml
+          kubectl apply -f k8s/local/deployment.yaml
+          kubectl apply -f k8s/local/service.yaml
 
       - name: Wait for rollout
         run: kubectl rollout status deployment/tasklineapp --timeout=120s
@@ -183,3 +183,4 @@ jobs:
             echo "Still waiting... (${i}/20)"
             sleep 15
           done
+##End
