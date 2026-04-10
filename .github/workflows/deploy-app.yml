@@ -7,7 +7,7 @@ on:
 
 jobs:
 
-  # ── JOB 1: Build and push the Docker image ──────────────────────────────────
+  # ── JOB 1: BUILD AND PUSH IMAGE ─────────────────────────────
   build-and-push:
     name: Build and Push Image
     runs-on: ubuntu-latest
@@ -18,21 +18,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Log in to ACR
-        if: vars.REGISTRY == 'acr'
-        uses: azure/docker-login@v1
-        with:
-          login-server: ${{ secrets.ACR_LOGIN_SERVER }}
-          username: ${{ secrets.AZURE_CLIENT_ID }}
-          password: ${{ secrets.AZURE_CLIENT_SECRET }}
-
-      - name: Log in to Docker Hub
-        if: vars.REGISTRY == 'dockerhub'
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Log in to GHCR
         if: vars.REGISTRY == 'ghcr'
@@ -45,12 +30,18 @@ jobs:
       - name: Generate image tag
         id: tag
         run: |
-          # REGISTRY_PATH is a GitHub Variable — set it to your full image path prefix:
-          # GHCR:       ghcr.io/YOUR_GITHUB_USERNAME/tasklineapp
-          # Docker Hub: YOUR_DOCKERHUB_USERNAME/tasklineapp
-          # ACR:        acrtasklineapp.azurecr.io/tasklineapp
+          echo "REGISTRY_PATH=${{ vars.REGISTRY_PATH }}"
+
           IMAGE_TAG="${{ vars.REGISTRY_PATH }}:${{ github.sha }}"
-          echo "image_tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
+
+          echo "Generated IMAGE_TAG=$IMAGE_TAG"
+
+          if [ -z "$IMAGE_TAG" ]; then
+            echo "ERROR: IMAGE_TAG is empty"
+            exit 1
+          fi
+
+          echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
 
       - name: Build and push image
         uses: docker/build-push-action@v5
@@ -60,7 +51,7 @@ jobs:
           tags: ${{ steps.tag.outputs.image_tag }}
           platforms: linux/amd64
 
-  # ── JOB 2: Provision infrastructure with Terraform ──────────────────────────
+  # ── JOB 2: TERRAFORM ─────────────────────────────
   terraform:
     name: Provision AKS with Terraform
     runs-on: ubuntu-latest
@@ -71,11 +62,11 @@ jobs:
       ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
       ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      # TF_VAR_* are picked up automatically as Terraform variable values
-      TF_VAR_resource_group_name: ${{ vars.TF_VAR_resource_group_name }}
-      TF_VAR_location: ${{ vars.TF_VAR_location }}
-      TF_VAR_aks_cluster_name: ${{ vars.TF_VAR_aks_cluster_name }}
-      TF_VAR_key_vault_name: ${{ vars.TF_VAR_key_vault_name }}
+
+      TF_VAR_resource_group_name: ${{ vars.TF_VAR_RESOURCE_GROUP_NAME }}
+      TF_VAR_location: ${{ vars.TF_VAR_LOCATION }}
+      TF_VAR_aks_cluster_name: ${{ vars.TF_VAR_AKS_CLUSTER_NAME }}
+
       TF_VAR_app_username: ${{ secrets.APP_USERNAME }}
       TF_VAR_app_password: ${{ secrets.APP_PASSWORD }}
       TF_VAR_api_key: ${{ secrets.API }}
@@ -90,22 +81,17 @@ jobs:
       - name: Terraform Init
         working-directory: terraform
         run: |
-          # All backend details come from GitHub Secrets — nothing hardcoded
           terraform init -input=false \
             -backend-config="resource_group_name=${{ secrets.TF_STATE_RESOURCE_GROUP }}" \
             -backend-config="storage_account_name=${{ secrets.TF_STATE_STORAGE_ACCOUNT }}" \
             -backend-config="container_name=${{ secrets.TF_STATE_CONTAINER }}" \
             -backend-config="key=tasklineapp.terraform.tfstate"
 
-      - name: Terraform Plan
-        working-directory: terraform
-        run: terraform plan -input=false -out=tfplan
-
       - name: Terraform Apply
         working-directory: terraform
-        run: terraform apply -input=false -auto-approve tfplan
+        run: terraform apply -input=false -auto-approve
 
-  # ── JOB 3: Deploy manifests to AKS ──────────────────────────────────────────
+  # ── JOB 3: DEPLOY TO AKS ─────────────────────────────
   deploy:
     name: Deploy to AKS
     runs-on: ubuntu-latest
@@ -128,13 +114,20 @@ jobs:
 
       - name: Get AKS credentials
         run: |
-          # Resource group and cluster name come from GitHub Variables — no hardcoding
           az aks get-credentials \
-            --resource-group ${{ vars.TF_VAR_resource_group_name }} \
-            --name ${{ vars.TF_VAR_aks_cluster_name }} \
+            --resource-group ${{ vars.TF_VAR_RESOURCE_GROUP_NAME }} \
+            --name ${{ vars.TF_VAR_AKS_CLUSTER_NAME }} \
             --overwrite-existing
+
       - name: Debug image tag
-        run: echo "${{ needs.build-and-push.outputs.image_tag }}"
+        run: echo "IMAGE = ${{ needs.build-and-push.outputs.image_tag }}"
+
+      - name: Validate image tag
+        run: |
+          if [ -z "${{ needs.build-and-push.outputs.image_tag }}" ]; then
+            echo "ERROR: image_tag is empty"
+            exit 1
+          fi
 
       - name: Create GHCR image pull secret
         if: vars.REGISTRY == 'ghcr'
@@ -147,14 +140,15 @@ jobs:
 
       - name: Update image in deployment manifest
         run: |
-        
-          sed -i "s|REGISTRY_IMAGE_PLACEHOLDER|${{ needs.build-and-push.outputs.image_tag }}|g" \
-          k8s/local/deployment.yaml
+          IMAGE="${{ needs.build-and-push.outputs.image_tag }}"
 
-      - name: Create or update Kubernetes secret
+          sed -i "s|REGISTRY_IMAGE_PLACEHOLDER|$IMAGE|g" k8s/local/deployment.yaml
+
+          echo "Updated deployment image:"
+          grep image k8s/local/deployment.yaml
+
+      - name: Create Kubernetes secret
         run: |
-          # Values come from GitHub Secrets and Variables — nothing hardcoded
-          # Idempotent — safe to run on every push
           kubectl create secret generic taskline-secrets \
             --from-literal=APP_TITLE="${{ vars.APP_TITLE }}" \
             --from-literal=APP_USERNAME="${{ secrets.APP_USERNAME }}" \
@@ -177,13 +171,10 @@ jobs:
           echo "Waiting for external IP..."
           for i in {1..20}; do
             IP=$(kubectl get svc tasklineapp-service \
-              -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null)
+              -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
             if [ -n "$IP" ]; then
               echo "App is live at: http://${IP}"
               break
             fi
-            echo "Still waiting... (${i}/20)"
             sleep 15
           done
-##
-

@@ -14,10 +14,13 @@ spec:
       labels:
         app: tasklineapp
     spec:
+      imagePullSecrets:
+        - name: ghcr-secret    # only needed if using GHCR — pipeline creates this conditionally
       containers:
         - name: tasklineapp
-          image: REGISTRY_IMAGE_PLACEHOLDER
-          imagePullPolicy: Always
+          # Placeholder — replaced by the pipeline sed command at deploy time
+          image: ghcr.io/peacerotimi6/tasklineapp:latest
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000
           env:
