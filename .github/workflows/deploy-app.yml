@@ -149,7 +149,7 @@ jobs:
         run: |
         
           sed -i "s|REGISTRY_IMAGE_PLACEHOLDER|${{ needs.build-and-push.outputs.image_tag }}|g" \
-            k8s/local/deployment.yaml
+          k8s/local/deployment.yaml
 
       - name: Create or update Kubernetes secret
         run: |
