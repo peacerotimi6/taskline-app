@@ -16,8 +16,8 @@ spec:
     spec:
       containers:
         - name: tasklineapp
-          image: tasklineapp:latest
-          imagePullPolicy: Never
+          image: REGISTRY_IMAGE_PLACEHOLDER
+          imagePullPolicy: Always
           ports:
             - containerPort: 3000
           env:

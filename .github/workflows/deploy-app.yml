@@ -145,9 +145,9 @@ jobs:
 
       - name: Update image in deployment manifest
         run: |
-          # Replace placeholder with the real SHA-tagged image from Job 1
+        
           sed -i "s|REGISTRY_IMAGE_PLACEHOLDER|${{ needs.build-and-push.outputs.image_tag }}|g" \
-            k8s/aks/deployment.yaml
+            k8s/local/deployment.yaml
 
       - name: Create or update Kubernetes secret
         run: |
@@ -183,4 +183,4 @@ jobs:
             echo "Still waiting... (${i}/20)"
             sleep 15
           done
-          
+#
