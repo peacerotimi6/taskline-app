@@ -80,7 +80,9 @@ jobs:
       TF_VAR_app_password: ${{ secrets.APP_PASSWORD }}
       TF_VAR_api_key: ${{ secrets.API }}
 
-    steps:
+    steps:aramolapeace@MacBookPro terraform2 % terraform state list
+data.azurerm_client_config.current
+azurerm_resource_group.main
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -185,4 +187,4 @@ jobs:
             echo "Still waiting... (${i}/20)"
             sleep 15
           done
-##
+#
