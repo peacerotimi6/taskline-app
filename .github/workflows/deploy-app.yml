@@ -133,6 +133,8 @@ jobs:
             --resource-group ${{ vars.TF_VAR_resource_group_name }} \
             --name ${{ vars.TF_VAR_aks_cluster_name }} \
             --overwrite-existing
+      - name: Debug image tag
+        run: echo "${{ needs.build-and-push.outputs.image_tag }}"
 
       - name: Create GHCR image pull secret
         if: vars.REGISTRY == 'ghcr'
@@ -183,4 +185,3 @@ jobs:
             echo "Still waiting... (${i}/20)"
             sleep 15
           done
-#
